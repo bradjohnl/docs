@@ -47,17 +47,25 @@ jobs:
           name: docs-app
           path: dist/docusaurus
 
+      - name: Upload pip-requirements-ci.txt to be used in the test-deploy step
+        uses: action/upload-artifact@v2
+        with:
+          name: pip-requirements-ci
+          path: .github/workflows/pip-requirements-ci.txt
+
   test-deploy:
     needs: build
     runs-on: ubuntu-latest
 
     steps:  
-    - uses: actions/checkout@v2
-
     - uses: actions/download-artifact@master
       with:
         name: docs-app
         path: dist/docusaurus
+
+    - uses: actions/download-artifact@master
+      with:
+        name: pip-requirements-ci
 
     - uses: actions/setup-python@v2
       with:
