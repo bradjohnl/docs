@@ -23,9 +23,7 @@ jobs:
         with:
           node-version: ${{ env.selected_node_version }}
           cache: yarn
-        env: 
-          node-version: ${{ env.selected_node_version }}
-
+          
       - name: Yarn install
         run: |
           NODE_OPTIONS="$node_options_build" 
@@ -70,7 +68,7 @@ jobs:
     - uses: actions/setup-python@v2
       with:
         cache: 'pip'
-        cache-dependency-path: '.github/workflows/pip-requirements-ci.txt'
+        cache-dependency-path: 'pip-requirements-ci.txt'
 
     - name: Configure localstack
       run: |
