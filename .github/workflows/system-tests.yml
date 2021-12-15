@@ -16,4 +16,4 @@ jobs:
     - name: Home page must be correctly accessible
       run: |
         echo "Testing if webpage responds correctly"
-        curl --fail {{inputs.home_url}}/docs/index.html
+        curl --fail ${{inputs.home_url}}/docs/index.html
