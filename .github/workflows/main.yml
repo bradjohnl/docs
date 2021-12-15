@@ -2,7 +2,7 @@ name: Deploy Docusaurus
 
 on:
   push:
-    branches: main
+    branches: "*"
 
 env:
   selected_node_version: 14.x
@@ -68,13 +68,32 @@ jobs:
 
     - name: Configure localstack
       run: |
-        aws configure set aws_access_key_id test
-        aws configure set aws_secret_access_key test
-        aws configure set default.region ap-northeast-1
-        aws mb s3://docs-test-bucket --endpoint-url=http://localhost:4566
+        # install LocalStack cli and awslocal
+        pip install localstack awscli-local[ver1]
+        # Make sure to pull the latest version of the image
+        docker pull localstack/localstack
+        # Start LocalStack in the background
+        localstack start -d
+        # Wait 30 seconds for the LocalStack container to become ready before timing out
+        echo "Waiting for LocalStack startup..."
+        localstack wait -t 30
+        echo "Startup complete"
+        awslocal s3 mb s3://docs-test-bucket
+        awslocal s3 ls
+         echo "LocalStack setup complete"
 
-    - name: Deploy to AWS
+    - name: Deploy to localStack to test
       uses: reggionick/s3-deploy@v3
+      with:
+          folder: dist/docusaurus
+          bucket: docs-test-bucket
+          private: true
+          noCache: true
+          bucket-region: ap-northeast-1
+
+    - name: Deploy to AWS when main branch gets updated
+      uses: reggionick/s3-deploy@v3
+      if: github.ref == 'refs/heads/main'
       with:
           folder: dist/docusaurus
           bucket: docs-test-bucket
