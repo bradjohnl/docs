@@ -89,13 +89,9 @@ jobs:
         awslocal s3 sync dist/docusaurus s3://docs-test-bucket/docs
         awslocal s3 ls
 
-  system-tests-predeploy:
-    needs: test-deploy
-    uses: bradjohnl/docs/.github/workflows/system-tests.yml@bradjohnl-cicd_aws_ghactions
-    with:
-      home_url: http://localhost:4566/docs-test-bucket
-
-    
+    - uses: bradjohnl/docs/.github/workflows/system-tests.yml@bradjohnl-cicd_aws_ghactions
+      with:
+        home_url: http://localhost:4566/docs-test-bucket
 
   deploy:
     needs: system-tests-predeploy
