@@ -49,6 +49,7 @@ jobs:
           path: dist/docusaurus
 
   test-deploy:
+    needs: test-build
     runs-on: ubuntu-latest
 
     steps:
