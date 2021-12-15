@@ -13,7 +13,7 @@ env:
 
 
 jobs:
-  test-build:
+  build:
     runs-on: ubuntu-latest
 
     strategy:
@@ -76,23 +76,21 @@ jobs:
         echo "Startup complete"
         awslocal s3 mb s3://docs-test-bucket
         awslocal s3 ls
-         echo "LocalStack setup complete"
+        echo "LocalStack setup complete"
 
     - name: Deploy to localStack to test
-      uses: reggionick/s3-deploy@v3
-      with:
-          folder: dist/docusaurus
-          bucket: docs-test-bucket
-          private: true
-          noCache: true
-          bucket-region: ap-northeast-1
+      run: |
+        awslocal configure set region eu-west-1
+        awslocal s3 sync dist/docusaurus s3://docs-test-bucket
+        awslocal s3 ls
+        curl http://localhost:4566/docs-test-bucket
 
     - name: Deploy to AWS when main branch gets updated
       uses: reggionick/s3-deploy@v3
       if: github.ref == 'refs/heads/main'
       with:
           folder: dist/docusaurus
-          bucket: docs-test-bucket
+          bucket: casper-docusaurus
           private: true
           noCache: true
           invalidation: /
