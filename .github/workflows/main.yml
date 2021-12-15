@@ -86,7 +86,7 @@ jobs:
     #TODO: Investigate about replicating an AWS S3 bucket into localstack so that tests are more reliable
     - name: Deploy to localStack to test
       run: |
-        awslocal s3 sync dist/docusaurus s3://docs-test-bucket
+        awslocal s3 sync dist/docusaurus s3://docs-test-bucket/docs/index.html
         awslocal s3 ls
 
     - name: Run system/e2e tests
