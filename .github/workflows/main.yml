@@ -69,13 +69,13 @@ jobs:
 
     - name: Configure localstack
       run: |
-        # install LocalStack cli and awslocal
+        echo "install LocalStack cli and awslocal"
         pip install localstack awscli-local[ver1]
-        # Make sure to pull the latest version of the image
+        echo "Make sure to pull the latest version of the image"
         docker pull localstack/localstack
-        # Start LocalStack in the background
+        echo "Start LocalStack in the background"
         localstack start -d
-        # Wait 30 seconds for the LocalStack container to become ready before timing out
+        #Wait 30 seconds for the LocalStack container to become ready before timing out
         echo "Waiting for LocalStack startup..."
         localstack wait -t 30
         echo "Startup complete"
@@ -89,13 +89,14 @@ jobs:
         awslocal s3 sync dist/docusaurus s3://docs-test-bucket/docs
         awslocal s3 ls
 
-    - name: Run system/e2e tests
-      run: |
-        echo "Testing if webpage responds correctly"
-        curl http://localhost:4566/docs-test-bucket/docs/index.html
+    - uses: bradjohnl/docs/.github/workflows/system-tests.yml
+      with:
+        home_url: http://localhost:4566/docs-test-bucket
+
+    
 
   deploy:
-    needs: test-deploy
+    needs: system-tests
     runs-on: ubuntu-latest
 
     steps:
@@ -110,3 +111,7 @@ jobs:
           invalidation: /
           bucket-region: ${{ secrets.S3_BUCKET_REGION }}
           dist-id: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+
+    - uses: bradjohnl/docs/.github/workflows/system-tests.yml
+      with:
+        home_url: https://casper.network/docs
