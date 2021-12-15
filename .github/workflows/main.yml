@@ -4,9 +4,6 @@ on:
   push:
     branches: "*"
 
-
-
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -86,11 +83,16 @@ jobs:
         awslocal s3 ls
         echo "LocalStack setup complete"
 
+    #TODO: Investigate about replicating an AWS S3 bucket into localstack so that tests are more reliable
     - name: Deploy to localStack to test
       run: |
         awslocal s3 sync dist/docusaurus s3://docs-test-bucket
         awslocal s3 ls
-        curl http://localhost:4566/docs-test-bucket
+
+    - name: Run system/e2e tests
+      run: |
+        echo "Testing if webpage responds correctly"
+        curl http://localhost:4566/docs-test-bucket/docs
 
   deploy:
     needs: test-deploy
