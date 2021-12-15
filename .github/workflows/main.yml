@@ -53,7 +53,7 @@ jobs:
           path: dist/docusaurus
 
   test-deploy:
-    needs: test-build
+    needs: build
     runs-on: ubuntu-latest
 
     steps:
@@ -61,6 +61,10 @@ jobs:
       with:
         name: docs-app
         path: dist/docusaurus
+
+    - uses: actions/setup-python@v2
+      with:
+        cache: 'pip'
 
     - name: Configure localstack
       run: |
@@ -85,6 +89,11 @@ jobs:
         awslocal s3 ls
         curl http://localhost:4566/docs-test-bucket
 
+  deploy:
+    needs: test-deploy
+    runs-on: ubuntu-latest
+
+    steps:
     - name: Deploy to AWS when main branch gets updated
       uses: reggionick/s3-deploy@v3
       if: github.ref == 'refs/heads/main'
