@@ -89,7 +89,7 @@ jobs:
         awslocal s3 sync dist/docusaurus s3://docs-test-bucket/docs
         awslocal s3 ls
 
-    - uses: bradjohnl/docs/.github/workflows/system-tests.yml
+    - uses: bradjohnl/docs/.github/workflows/system-tests.yml@bradjohnl-cicd_aws_ghactions
       with:
         home_url: http://localhost:4566/docs-test-bucket
 
