@@ -113,6 +113,7 @@ jobs:
           bucket-region: ${{ secrets.S3_BUCKET_REGION }}
           dist-id: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
 
-    - uses: bradjohnl/docs/.github/workflows/system-tests.yml
-      with:
-        home_url: https://casper.network/docs
+  system-tests:
+    uses: bradjohnl/docs/.github/workflows/system-tests.yml@bradjohnl-cicd_aws_ghactions
+    with:
+      home_url: https://casper.network/docs
