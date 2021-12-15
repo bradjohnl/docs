@@ -5,12 +5,9 @@ on:
     branches: "*"
 
 env:
-  selected_node_version: 14.x
+  selected_node_version: 14
   node_options_build: --max-old-space-size=4096
   node_options_run_node_v17: --openssl-legacy-provider
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
 
 jobs:
   build:
@@ -19,7 +16,7 @@ jobs:
     strategy:
       matrix:
         #node-version: [ 17.x, 16.x, 14.x ]
-        node-version: [ 14 ]
+        node-version: $selected_node_version
 
     steps:
       - uses: actions/checkout@v2
@@ -30,7 +27,7 @@ jobs:
           node-version: ${{matrix.node-version}}
           cache: yarn
 
-      - name: Test install
+      - name: Yarn install
         run: |
           NODE_OPTIONS="$node_options_build" 
           yarn install
@@ -65,6 +62,7 @@ jobs:
     - uses: actions/setup-python@v2
       with:
         cache: 'pip'
+        cache-dependency-path: '**/pip-requirements-ci.txt'
 
     - name: Configure localstack
       run: |
