@@ -89,7 +89,7 @@ jobs:
         awslocal s3 sync dist/docusaurus s3://docs-test-bucket/docs
         awslocal s3 ls
 
-  system-tests:
+  system-tests-predeploy:
     uses: bradjohnl/docs/.github/workflows/system-tests.yml@bradjohnl-cicd_aws_ghactions
     with:
       home_url: http://localhost:4566/docs-test-bucket
@@ -113,7 +113,7 @@ jobs:
           bucket-region: ${{ secrets.S3_BUCKET_REGION }}
           dist-id: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
 
-  system-tests:
+  system-tests-postdeploy:
     uses: bradjohnl/docs/.github/workflows/system-tests.yml@bradjohnl-cicd_aws_ghactions
     with:
       home_url: https://casper.network/docs
