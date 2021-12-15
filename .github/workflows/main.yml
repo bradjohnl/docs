@@ -89,12 +89,13 @@ jobs:
         awslocal s3 sync dist/docusaurus s3://docs-test-bucket/docs
         awslocal s3 ls
 
-    - uses: bradjohnl/docs/.github/workflows/system-tests.yml@bradjohnl-cicd_aws_ghactions
-      with:
-        home_url: http://localhost:4566/docs-test-bucket
+    - name: Run system/e2e tests
+      run: |
+        echo "Testing if webpage responds correctly"
+        curl --fail http://localhost:4566/docs-test-bucket/docs/index.html
 
   deploy:
-    needs: system-tests-predeploy
+    needs: test-deploy
     runs-on: ubuntu-latest
 
     steps:
@@ -110,8 +111,7 @@ jobs:
           bucket-region: ${{ secrets.S3_BUCKET_REGION }}
           dist-id: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
 
-  system-tests-postdeploy:
-    needs: deploy
-    uses: bradjohnl/docs/.github/workflows/system-tests.yml@bradjohnl-cicd_aws_ghactions
-    with:
-      home_url: https://casper.network/docs
+    - name: Run system/e2e tests
+      run: |
+        echo "Testing if webpage responds correctly"
+        curl --fail http://casper.network/docs/index.html
