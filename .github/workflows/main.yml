@@ -17,15 +17,15 @@ jobs:
     strategy:
       matrix:
         #node-version: [ 17.x, 16.x, 14.x ]
-        node-version: ${{env.selected_node_version}}
+        node-version: ${{ env.selected_node_version }}
 
     steps:
       - uses: actions/checkout@v2
 
-      - name: Use Node.js ${{matrix.node-version}}
+      - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v2
         with:
-          node-version: ${{matrix.node-version}}
+          node-version: ${{ matrix.node-version }}
           cache: yarn
 
       - name: Yarn install
@@ -45,7 +45,7 @@ jobs:
 
       - name: Upload target version artifact
         uses: actions/upload-artifact@v2
-        if: ${{matrix.node-version}} == ${{env.selected_node_version}}
+        if: ${{ matrix.node-version }} == ${{ env.selected_node_version }}
         with:
           name: docs-app
           path: dist/docusaurus
