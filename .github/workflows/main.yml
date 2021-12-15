@@ -19,7 +19,7 @@ jobs:
     strategy:
       matrix:
         #node-version: [ 17.x, 16.x, 14.x ]
-        node-version: [ 14.x ]
+        node-version: [ 14 ]
 
     steps:
       - uses: actions/checkout@v2
@@ -29,14 +29,17 @@ jobs:
         with:
           node-version: ${{matrix.node-version}}
           cache: yarn
+
       - name: Test install
         run: |
           NODE_OPTIONS="$node_options_build" 
-          yarn install --frozen-lockfile
+          yarn install
+
       - name: Run code analysis
         run: |
           NODE_OPTIONS="$node_options_build"
           yarn format
+
       - name: Build app
         run: |
           NODE_OPTIONS="$node_options_build"
