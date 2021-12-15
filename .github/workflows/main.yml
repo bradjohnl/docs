@@ -11,17 +11,8 @@ env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-services:
-  localstack:
-    image: localstack/localstack
-    env:
-      SERVICES: s3
-      DEFAULT_REGION: ap-northeast-1
-      DATA_DIR: /tmp/localstack/data
-    ports: ["4566:4566"]
 
 jobs:
-
   test-build:
     runs-on: ubuntu-latest
 
