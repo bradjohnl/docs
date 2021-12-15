@@ -90,6 +90,7 @@ jobs:
         awslocal s3 ls
 
   system-tests-predeploy:
+    needs: test-deploy
     uses: bradjohnl/docs/.github/workflows/system-tests.yml@bradjohnl-cicd_aws_ghactions
     with:
       home_url: http://localhost:4566/docs-test-bucket
@@ -97,7 +98,7 @@ jobs:
     
 
   deploy:
-    needs: system-tests
+    needs: system-tests-predeploy
     runs-on: ubuntu-latest
 
     steps:
@@ -114,6 +115,7 @@ jobs:
           dist-id: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
 
   system-tests-postdeploy:
+    needs: deploy
     uses: bradjohnl/docs/.github/workflows/system-tests.yml@bradjohnl-cicd_aws_ghactions
     with:
       home_url: https://casper.network/docs
