@@ -48,7 +48,7 @@ jobs:
           path: dist/docusaurus
 
       - name: Upload pip-requirements-ci.txt to be used in the test-deploy step
-        uses: action/upload-artifact@v2
+        uses: actions/upload-artifact@v2
         with:
           name: pip-requirements-ci
           path: .github/workflows/pip-requirements-ci.txt
