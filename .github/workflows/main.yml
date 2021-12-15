@@ -1,4 +1,4 @@
-name: Deploy Docusaurus
+name: Docusaurus CICD
 
 on:
   push:
@@ -18,7 +18,8 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [ 17.x, 16.x, 14.x ]
+        #node-version: [ 17.x, 16.x, 14.x ]
+        node-version: [ 14.x ]
 
     steps:
       - uses: actions/checkout@v2
