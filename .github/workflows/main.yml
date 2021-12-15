@@ -84,15 +84,29 @@ jobs:
         echo "LocalStack setup complete"
 
     #TODO: Investigate about replicating an AWS S3 bucket into localstack so that tests are more reliable
+    #TODO: Reduce code duplication with reusable workflows. The problem is that the LocalStack container does not persist between jobs.
+    #     One could actually configure localstack docker container to persist a volume on the runner and then upload the artifact.
     - name: Deploy to localStack to test
       run: |
         awslocal s3 sync dist/docusaurus s3://docs-test-bucket/docs
         awslocal s3 ls
 
-    - name: Run system/e2e tests
+    #TODO: Avoid code repetition, but it's tricky as GH does not support loops on single actions. Might use good ol' bash.
+    #TODO: This can be expanded to test every URL available.
+    - name: Test home page
       run: |
         echo "Testing if webpage responds correctly"
         curl --fail http://localhost:4566/docs-test-bucket/docs/index.html
+
+    - name: Test a random page
+      run: |
+        echo "Testing if a page responds correctly"
+        curl --fail http://localhost:4566/docs-test-bucket/docs/operators/create
+
+    - name: Test another random page
+      run: |
+        echo "Testing if a page responds correctly"
+        curl --fail https://casper.network/docs/design/serialization-standard
 
   deploy:
     needs: test-deploy
@@ -111,7 +125,19 @@ jobs:
           bucket-region: ${{ secrets.S3_BUCKET_REGION }}
           dist-id: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
 
-    - name: Run system/e2e tests
+    #TODO: Avoid code repetition, but it's tricky as GH does not support loops on single actions. Might use good ol' bash.
+    #TODO: This can be expanded to test every URL available.    - name: Test home page
+    - name: Test home page
       run: |
         echo "Testing if webpage responds correctly"
-        curl --fail http://casper.network/docs/index.html
+        curl --fail https://casper.network/docs/index.html
+
+    - name: Test a random page
+      run: |
+        echo "Testing if a page responds correctly"
+        curl --fail https://casper.network/docs-test-bucket/docs/operators/create
+
+    - name: Test another random page
+      run: |
+        echo "Testing if a page responds correctly"
+        curl --fail https://casper.network/docs/design/serialization-standard
