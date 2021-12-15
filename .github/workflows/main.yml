@@ -90,7 +90,6 @@ jobs:
 
     - name: Deploy to localStack to test
       run: |
-        awslocal configure set region eu-west-1
         awslocal s3 sync dist/docusaurus s3://docs-test-bucket
         awslocal s3 ls
         curl http://localhost:4566/docs-test-bucket
