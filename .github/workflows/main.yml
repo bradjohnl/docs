@@ -80,7 +80,7 @@ jobs:
         localstack wait -t 30
         echo "Startup complete"
         awslocal s3 mb s3://docs-test-bucket
-        awslocal s3 ls
+        awslocal s3 ls 's3://docs-test-bucket'
         echo "LocalStack setup complete"
 
     #TODO: Investigate about replicating an AWS S3 bucket into localstack so that tests are more reliable
