@@ -42,15 +42,17 @@ jobs:
           name: docs-app
           path: dist/docusaurus
 
-      - name: Upload pip-requirements-ci.txt to be used in the test-deploy step
-        uses: actions/upload-artifact@v2
-        with:
-          name: pip-requirements-ci
-          path: .github/workflows/pip-requirements-ci.txt
-
   test-deploy:
     needs: build
     runs-on: ubuntu-latest
+
+    services:
+      localstack:
+        image: localstack/localstack
+        ports:
+            - 4576:4576
+            - 4572:4572
+        options: -e SERVICES=sqs:4576,s3:4572
 
     steps:  
     - uses: actions/download-artifact@master
@@ -58,54 +60,16 @@ jobs:
         name: docs-app
         path: dist/docusaurus
 
-    - uses: actions/download-artifact@master
-      with:
-        name: pip-requirements-ci
-
-    - uses: actions/setup-python@v2
-      with:
-        cache: 'pip'
-        cache-dependency-path: 'pip-requirements-ci.txt'
-
     #https://github.com/satackey/action-docker-layer-caching
     - uses: satackey/action-docker-layer-caching@v0.0.11
       # Ignore the failure of a step and avoid terminating the job.
       continue-on-error: true
 
-    - name: Configure localstack
-      run: |
-        echo "install LocalStack cli and awslocal"
-        pip install localstack awscli-local[ver1]
-        echo "Make sure to pull the latest version of the image"
-        docker pull localstack/localstack
-        echo "Start LocalStack in the background"
-        localstack start -d
-        #Wait 30 seconds for the LocalStack container to become ready before timing out
-        echo "Waiting for LocalStack startup..."
-        localstack wait -t 30
-        echo "Startup complete"
-        awslocal s3 mb s3://docs-test-bucket
-        echo "LocalStack setup complete"
-
     #https://stackoverflow.com/questions/44382709/aws-s3-bucket-404-not-found/51143174#51143174
     #https://sammeechward.com/aws-cli-s3-static-website/
-    - name: Configure S3 to serve the static site
+    - name: Create S3 bucket
       run: |
-        awslocal s3api put-public-access-block \
-        --bucket docs-test-bucket \
-        --public-access-block-configuration "BlockPublicAcls=false,IgnorePublicAcls=false,BlockPublicPolicy=false,RestrictPublicBuckets=false"
-        awslocal s3api put-bucket-policy --bucket your-bucket-name --policy "{
-        \"Version\": \"2012-10-17\",
-        \"Statement\": [
-            {
-                \"Sid\": \"PublicReadGetObject\",
-                \"Effect\": \"Allow\",
-                \"Principal\": \"*\",
-                \"Action\": \"s3:GetObject\",
-                \"Resource\": \"arn:aws:s3:::your-bucket-name/*\"
-            }
-        ]}"
-        awslocal s3 website s3://docs-test-bucket/ --index-document index.html --error-document index.html
+        awslocal s3 mb s3://docs-test-bucket
 
     #TODO: Investigate about replicating an AWS S3 bucket into localstack so that tests are more reliable
     #TODO: Reduce code duplication with reusable workflows. The problem is that the LocalStack container does not persist between jobs.
