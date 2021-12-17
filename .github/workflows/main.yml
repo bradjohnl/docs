@@ -106,7 +106,7 @@ jobs:
     - name: Test another random page
       run: |
         echo "Testing if a page responds correctly"
-        curl --fail https://casper.network/docs/design/serialization-standard
+        curl --fail http://localhost:4566/docs-test-bucket/docs/design/serialization-standard
 
   deploy:
     needs: test-deploy
@@ -126,7 +126,7 @@ jobs:
           dist-id: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
 
     #TODO: Avoid code repetition, but it's tricky as GH does not support loops on single actions. Might use good ol' bash.
-    #TODO: This can be expanded to test every URL available.    - name: Test home page
+    #TODO: This can be expanded to test every URL available. 
     - name: Test home page
       run: |
         echo "Testing if webpage responds correctly"
