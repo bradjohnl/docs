@@ -63,6 +63,10 @@ jobs:
       # Ignore the failure of a step and avoid terminating the job.
       continue-on-error: true
 
+    - name: Install awslocal
+      run: |
+        pip install awscli-local[ver1]
+
     #https://stackoverflow.com/questions/44382709/aws-s3-bucket-404-not-found/51143174#51143174
     #https://sammeechward.com/aws-cli-s3-static-website/
     - name: Create S3 bucket
@@ -74,7 +78,6 @@ jobs:
     #     One could actually configure localstack docker container to persist a volume on the runner and then upload the artifact.
     - name: Deploy to localStack to test
       run: |
-        pip install awscli-local[ver1]
         awslocal s3 sync dist/docusaurus s3://docs-test-bucket/docs
 
     #TODO: Avoid code repetition, but it's tricky as GH does not support loops on single actions. Might use good ol' bash.
