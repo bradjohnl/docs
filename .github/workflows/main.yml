@@ -80,8 +80,27 @@ jobs:
         localstack wait -t 30
         echo "Startup complete"
         awslocal s3 mb s3://docs-test-bucket
-        awslocal s3 ls 's3://docs-test-bucket'
         echo "LocalStack setup complete"
+
+    #https://stackoverflow.com/questions/44382709/aws-s3-bucket-404-not-found/51143174#51143174
+    #https://sammeechward.com/aws-cli-s3-static-website/
+    - name: Configure S3 to serve the static site
+      run: |
+        awslocal s3api put-public-access-block \
+        --bucket docs-test-bucket \
+        --public-access-block-configuration "BlockPublicAcls=false,IgnorePublicAcls=false,BlockPublicPolicy=false,RestrictPublicBuckets=false"
+        awslocal s3api put-bucket-policy --bucket your-bucket-name --policy "{
+        \"Version\": \"2012-10-17\",
+        \"Statement\": [
+            {
+                \"Sid\": \"PublicReadGetObject\",
+                \"Effect\": \"Allow\",
+                \"Principal\": \"*\",
+                \"Action\": \"s3:GetObject\",
+                \"Resource\": \"arn:aws:s3:::your-bucket-name/*\"
+            }
+        ]}"
+        awslocal s3 website s3://docs-test-bucket/ --index-document index.html --error-document index.html
 
     #TODO: Investigate about replicating an AWS S3 bucket into localstack so that tests are more reliable
     #TODO: Reduce code duplication with reusable workflows. The problem is that the LocalStack container does not persist between jobs.
@@ -89,9 +108,6 @@ jobs:
     - name: Deploy to localStack to test
       run: |
         awslocal s3 sync dist/docusaurus s3://docs-test-bucket/docs
-        awslocal s3 ls
-        #https://stackoverflow.com/questions/44382709/aws-s3-bucket-404-not-found/51143174#51143174
-        awslocal s3 website s3://docs-test-bucket/ --index-document index.html --error-document index.html
 
     #TODO: Avoid code repetition, but it's tricky as GH does not support loops on single actions. Might use good ol' bash.
     #TODO: This can be expanded to test every URL available.
