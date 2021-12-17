@@ -67,18 +67,45 @@ jobs:
       run: |
         pip install awscli-local[ver1]
 
-    #https://stackoverflow.com/questions/44382709/aws-s3-bucket-404-not-found/51143174#51143174
-    #https://sammeechward.com/aws-cli-s3-static-website/
-    - name: Create S3 bucket
-      run: |
-        awslocal s3 mb s3://docs-test-bucket
-
     #TODO: Investigate about replicating an AWS S3 bucket into localstack so that tests are more reliable
     #TODO: Reduce code duplication with reusable workflows. The problem is that the LocalStack container does not persist between jobs.
     #     One could actually configure localstack docker container to persist a volume on the runner and then upload the artifact.
+    #Taken from: https://sammeechward.com/aws-cli-s3-static-website/
     - name: Deploy to localStack to test
       run: |
-        awslocal s3 sync dist/docusaurus s3://docs-test-bucket/docs
+
+        # 1. Create a new bucket with a unique name
+        awslocal s3 mb --region us-east-1 "s3://$bucket_name" 
+
+        # 2. Enable public access to the bucket
+        awslocal s3api put-public-access-block \
+            --bucket $bucket_name \
+            --public-access-block-configuration "BlockPublicAcls=false,IgnorePublicAcls=false,BlockPublicPolicy=false,RestrictPublicBuckets=false"
+
+        # 3. Update the bucket policy for public read access:
+        awslocal s3api put-bucket-policy --bucket $bucket_name --policy "{
+          \"Version\": \"2012-10-17\",
+          \"Statement\": [
+              {
+                  \"Sid\": \"PublicReadGetObject\",
+                  \"Effect\": \"Allow\",
+                  \"Principal\": \"*\",
+                  \"Action\": \"s3:GetObject\",
+                  \"Resource\": \"arn:aws:s3:::$bucket_name/*\"
+              }
+          ]
+        }"
+
+        # 4. Enable the s3 bucket to host an `index` and `error` html page
+        awslocal s3 website "s3://$bucket_name" --index-document index.html --error-document index.html
+
+        # 5. Upload you website
+        awslocal s3 sync $website_directory "s3://$bucket_name/" 
+
+      env:
+        bucket_name: docs-test-bucket
+        website_directory: dist/docusaurus
+
 
     #TODO: Avoid code repetition, but it's tricky as GH does not support loops on single actions. Might use good ol' bash.
     #TODO: This can be expanded to test every URL available.
