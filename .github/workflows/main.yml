@@ -94,7 +94,10 @@ jobs:
                   \"Resource\": \"arn:aws:s3:::$bucket_name/*\"
               }
           ]
-        }""
+        }"
+
+        #https://dailyjsx.com/localstack/
+        awslocal s3api put-bucket-acl --bucket $bucket_name --acl public-read
 
         # 4. Enable the s3 bucket to host an `index` and `error` html page
         awslocal s3 website "s3://$bucket_name" --index-document index.html --error-document index.html
@@ -117,12 +120,12 @@ jobs:
     - name: Test a random page
       run: |
         echo "Testing if a page responds correctly"
-        curl --fail http://localhost:4566/docs-test-bucket/docs/operators/create
+        curl --fail http://localhost:4566/docs-test-bucket/docs/operators/create/index.html
 
     - name: Test another random page
       run: |
         echo "Testing if a page responds correctly"
-        curl --fail http://localhost:4566/docs-test-bucket/docs/design/serialization-standard
+        curl --fail http://localhost:4566/docs-test-bucket/docs/design/serialization-standard/index.html
 
   deploy:
     needs: test-deploy
