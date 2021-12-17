@@ -67,6 +67,11 @@ jobs:
         cache: 'pip'
         cache-dependency-path: 'pip-requirements-ci.txt'
 
+    #https://github.com/satackey/action-docker-layer-caching
+    - uses: satackey/action-docker-layer-caching@v0.0.11
+      # Ignore the failure of a step and avoid terminating the job.
+      continue-on-error: true
+
     - name: Configure localstack
       run: |
         echo "install LocalStack cli and awslocal"
