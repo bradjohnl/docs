@@ -100,7 +100,7 @@ jobs:
         awslocal s3 website "s3://$bucket_name" --index-document index.html --error-document index.html
 
         # 5. Upload you website
-        awslocal s3 sync $website_directory "s3://$bucket_name/" 
+        awslocal s3 sync $website_directory "s3://$bucket_name/$target_directory" 
 
       env:
         bucket_name: docs-test-bucket
@@ -112,17 +112,17 @@ jobs:
     - name: Test home page
       run: |
         echo "Testing if webpage responds correctly"
-        curl --fail http://localhost:4566/docs-test-bucket/docs/index.html
+        curl --fail http://localhost:4566/docs-test-bucket
 
     - name: Test a random page
       run: |
         echo "Testing if a page responds correctly"
-        curl --fail http://localhost:4566/docs-test-bucket/docs/operators/create
+        curl --fail http://localhost:4566/docs-test-bucket/operators/create
 
     - name: Test another random page
       run: |
         echo "Testing if a page responds correctly"
-        curl --fail http://localhost:4566/docs-test-bucket/docs/design/serialization-standard
+        curl --fail http://localhost:4566/docs-test-bucket/design/serialization-standard
 
   deploy:
     needs: test-deploy
