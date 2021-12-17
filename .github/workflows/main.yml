@@ -90,7 +90,8 @@ jobs:
       run: |
         awslocal s3 sync dist/docusaurus s3://docs-test-bucket/docs
         awslocal s3 ls
-        awslocal s3 website s3://docs-test-bucket/ --index-document index.html --error-document error.html
+        #https://stackoverflow.com/questions/44382709/aws-s3-bucket-404-not-found/51143174#51143174
+        awslocal s3 website s3://docs-test-bucket/ --index-document index.html --error-document index.html
 
     #TODO: Avoid code repetition, but it's tricky as GH does not support loops on single actions. Might use good ol' bash.
     #TODO: This can be expanded to test every URL available.
