@@ -77,25 +77,6 @@ jobs:
         # 1. Create a new bucket with a unique name
         awslocal s3 mb --region us-east-1 "s3://$bucket_name" 
 
-        # 2. Enable public access to the bucket
-        awslocal s3api put-public-access-block \
-            --bucket $bucket_name \
-            --public-access-block-configuration "BlockPublicAcls=false,IgnorePublicAcls=false,BlockPublicPolicy=false,RestrictPublicBuckets=false"
-
-        # 3. Update the bucket policy for public read access:
-        awslocal s3api put-bucket-policy --bucket $bucket_name --policy "{
-          \"Version\": \"2012-10-17\",
-          \"Statement\": [
-              {
-                  \"Sid\": \"PublicReadGetObject\",
-                  \"Effect\": \"Allow\",
-                  \"Principal\": \"*\",
-                  \"Action\": \"s3:GetObject\",
-                  \"Resource\": \"arn:aws:s3:::$bucket_name/*\"
-              }
-          ]
-        }"
-
         #https://dailyjsx.com/localstack/
         awslocal s3api put-bucket-acl --bucket $bucket_name --acl public-read
 
@@ -128,13 +109,13 @@ jobs:
         curl --fail http://localhost:4566/docs-test-bucket/docs/design/serialization-standard/index.html
 
   deploy:
+    if: github.ref == 'refs/heads/main'
     needs: test-deploy
     runs-on: ubuntu-latest
 
     steps:
     - name: Deploy to AWS when main branch gets updated
       uses: reggionick/s3-deploy@v3
-      if: github.ref == 'refs/heads/main'
       with:
           folder: dist/docusaurus
           bucket: casper-docusaurus
