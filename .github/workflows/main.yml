@@ -74,6 +74,7 @@ jobs:
     #     One could actually configure localstack docker container to persist a volume on the runner and then upload the artifact.
     - name: Deploy to localStack to test
       run: |
+        pip install awscli-local[ver1]
         awslocal s3 sync dist/docusaurus s3://docs-test-bucket/docs
 
     #TODO: Avoid code repetition, but it's tricky as GH does not support loops on single actions. Might use good ol' bash.
