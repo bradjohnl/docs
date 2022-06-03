@@ -32,7 +32,7 @@ jobs:
           echo "::set-output name=branch_list::$BRANCH_ARRAY"
         
   create-pull-request:
-    if: branch_list != null
+    if: ${{ needs.setup.outputs.matrix != '[]' }} 
     needs: [ setup ]
     runs-on: ubuntu-latest
     strategy:
