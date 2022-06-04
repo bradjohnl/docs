@@ -9,41 +9,33 @@ on:
 
 
 jobs:
-  setup:
+  setup-fb-sync:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.setup-branch-matrix.outputs.branch_list }}
     steps:
       - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
 
       - name: Install Ruby
         run: |
           sudo apt-get update && sudo apt-get install -y ruby-full ruby-bundler build-essential
 
-      # https://stackoverflow.com/a/62335531
-      - name: Fetch all the branches of the repository
-        run: |
-          git remote set-branches origin '*'
-          git fetch --all
-
       - name: Get all the branches in the repository that begin with feat-* and save the results
         run: |
-          echo "BRANCH_ARRAY=[$( git branch --list "feat-*" | sed 's/^..//' | ruby -ryaml -e 'puts ARGF.read.lines.map { |l| l.chomp.inspect }.join(", ")' | tail -n 1)]" >> $GITHUB_ENV
+          echo "BRANCH_ARRAY=[$( git branch -r | grep "feat-" | sed -e 's/^[[:space:]]*.*\///' | ruby -ryaml -e 'puts ARGF.read.lines.map { |l| l.chomp.inspect }.join(", ")' | tail -n 1)]" >> $GITHUB_ENV
 
       - name: Create a single-line array out of the branches.txt content and populate the branch matrix
         id: setup-branch-matrix
         run: |
           echo "::set-output name=branch_list::$BRANCH_ARRAY"
         
-  create-pull-request:
-    if: ${{ needs.setup.outputs.matrix != '[]' }} 
-    needs: [ setup ]
+  create-pull-request-fb:
+    if: ${{ needs.setup-fb-sync.outputs.matrix != '[]' }} 
+    needs: [ setup-fb-sync ]
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        branch_list: ${{ fromJson(needs.setup.outputs.matrix) }}
+        branch_list: ${{ fromJson(needs.setup-fb-sync.outputs.matrix) }}
 
     steps:
       - uses: actions/checkout@v3
