@@ -22,6 +22,10 @@ jobs:
         run: |
           sudo apt-get update && sudo apt-get install -y ruby-full ruby-bundler build-essential
 
+      - name: Fetch all the branches of the repository
+        run: |
+          git fetch --all
+
       - name: Get all the branches in the repository that begin with feat-* and save the results
         run: |
           echo "BRANCH_ARRAY=[$( git branch --list "feat-*" | sed 's/^..//' | ruby -ryaml -e 'puts ARGF.read.lines.map { |l| l.chomp.inspect }.join(", ")' | tail -n 1)]" >> $GITHUB_ENV
