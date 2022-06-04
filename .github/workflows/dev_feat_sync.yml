@@ -22,9 +22,11 @@ jobs:
         run: |
           sudo apt-get update && sudo apt-get install -y ruby-full ruby-bundler build-essential
 
+      # https://stackoverflow.com/a/62335531
       - name: Fetch all the branches of the repository
         run: |
-          git fetch --all
+          git remote set-branches origin '*'
+          git fetch
 
       - name: Get all the branches in the repository that begin with feat-* and save the results
         run: |
