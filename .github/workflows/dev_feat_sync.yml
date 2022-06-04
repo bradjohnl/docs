@@ -22,7 +22,7 @@ jobs:
 
       - name: Get all the branches in the repository that begin with feat-* and save the results
         run: |
-          echo "BRANCH_ARRAY=[$( git branch -r | grep "feat-" | sed -e 's/^[[:space:]]*.*\///' | ruby -ryaml -e 'puts ARGF.read.lines.map { |l| l.chomp.inspect }.join(", ")' | tail -n 1)]" >> $GITHUB_ENV
+          echo "BRANCH_ARRAY=[$( git branch -a | grep "feat-" | sed 's/[[:space:]]*//' | sed 's/.*\///' | ruby -ryaml -e 'puts ARGF.read.lines.map { |l| l.chomp.inspect }.join(", ")' | tail -n 1)]" >> $GITHUB_ENV
 
       - name: Create a single-line array out of the branches.txt content and populate the branch matrix
         id: setup-branch-matrix
