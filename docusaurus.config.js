@@ -24,6 +24,7 @@ module.exports = {
     baseUrl: "/",
     /* Optional */
     // customFields: dataConfig,
+    themes: ["docusaurus-theme-search-typesense"],
     themeConfig: {
         // algolia: algoliaConfig,
         // announcementBar: announcementConfig,
@@ -36,7 +37,28 @@ module.exports = {
         // metadatas: metadatasConfig,
         navbar: navbarConfig,
         prism: prismConfig,
+        typesense: {
+            typesenseCollectionName: "docusaurus-2", // Replace with your own doc site's name. Should match the collection name in the scraper settings.
+
+            typesenseServerConfig: {
+                nodes: [
+                    {
+                        host: "localhost",
+                        port: 8181,
+                        protocol: "http",
+                    },
+                ],
+                apiKey: "xyz",
+            },
+
+            // Optional: Typesense search parameters: https://typesense.org/docs/0.21.0/api/documents.md#search-parameters
+            typesenseSearchParameters: {},
+
+            // Optional
+            contextualSearch: true,
+        },
     },
+
     presets: [
         [
             "@docusaurus/preset-classic",
@@ -72,6 +94,12 @@ module.exports = {
                 theme: {
                     customCss: [require.resolve("./src/assets/scss/theme.scss")],
                 },
+                sitemap: {
+                    changefreq: "weekly",
+                    priority: 0.5,
+                    ignorePatterns: ["/tags/**"],
+                    filename: "sitemap.xml",
+                },
             },
         ],
     ],
@@ -88,6 +116,6 @@ module.exports = {
                 silent: false,
             },
         ],
-        [require.resolve("@cmfcmf/docusaurus-search-local"), algoliaOfflineConfig],
+        //[require.resolve("@cmfcmf/docusaurus-search-local"), algoliaOfflineConfig],
     ],
 };
